@@ -6,7 +6,7 @@ export function createServer() {
     const app = express()
     app.use(express.json())
 
-    app.get('/api', (_req, res) => {
+    app.get('/', (_req, res) => {
         console.log('someone pinged here!!')
         res.send({message: 'Home'})
     })
