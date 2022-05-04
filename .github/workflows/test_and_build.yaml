@@ -15,10 +15,8 @@ jobs:
         with:
           node-version: '14'
       - run: npm install
-      - run: npm test
-  build:
-    runs-on: ubuntu-latest
-    needs: test
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - run: npm run build
+      - name: test
+        run: npm test
+      - name: build
+        if: github.ref == 'refs/heads/main'
+        run: npm run build
