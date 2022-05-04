@@ -1,12 +1,12 @@
 import express from 'express'
 
-const PORT = 3000
+const PORT = process.env.ENVIRONMENT === "prod" ? 80 : process.env.PORT || 3000
 
 export function createServer() {
     const app = express()
     app.use(express.json())
 
-    app.get('/', (_req, res) => {
+    app.get('/api', (_req, res) => {
         console.log('someone pinged here!!')
         res.send({message: 'Home'})
     })
