@@ -10,6 +10,11 @@ export function createServer() {
         console.log('someone pinged here!!')
         res.send({message: 'Home'})
     })
+
+    app.get('/api', (_req, res) => {
+        res.send({message: 'api'})
+    })
+
     return app
 }
 
