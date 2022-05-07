@@ -1,4 +1,5 @@
 import express from 'express'
+import router from './routes'
 
 const PORT = process.env.ENVIRONMENT === "prod" ? 80 : process.env.PORT || 3000
 
@@ -7,13 +8,10 @@ export function createServer() {
     app.use(express.json())
 
     app.get('/', (_req, res) => {
-        console.log('someone pinged here!!')
         res.send({message: 'Home'})
     })
 
-    app.get('/api', (_req, res) => {
-        res.send({message: 'api'})
-    })
+    app.use('/api', router)
 
     return app
 }

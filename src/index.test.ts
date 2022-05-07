@@ -1,7 +1,6 @@
 import request from 'supertest'
 import {createServer} from './server'
 
-
 describe('GET /', function() {
     it('responds with json', (done) => {
         request(createServer())
