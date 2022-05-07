@@ -1,9 +1,23 @@
 import express from 'express'
 import router from './routes'
+import myDataSource from "./app-data-source"
 
-const PORT = process.env.ENVIRONMENT === "prod" ? 80 : process.env.PORT || 3000
+
+const env = process.env.ENVIRONMENT;
+const PORT = env === "prod" ? 80 : process.env.PORT || 3000
 
 export function createServer() {
+    // establish database connection
+    if (env === "prod" || env === "dev"){
+        myDataSource
+            .initialize()
+            .then(() => {
+                console.log("Data Source has been initialized!")
+            })
+            .catch((err) => {
+                console.error("Error during Data Source initialization:", err)
+            })
+    }
     const app = express()
     app.use(express.json())
 
