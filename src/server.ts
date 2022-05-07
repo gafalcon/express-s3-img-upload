@@ -8,7 +8,6 @@ export function createServer() {
     app.use(express.json())
 
     app.get('/', (_req, res) => {
-        console.log('someone pinged here!!')
         res.send({message: 'Home'})
     })
 

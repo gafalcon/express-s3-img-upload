@@ -9,11 +9,7 @@ const s3 = new AWS.S3({
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
 })
 
-let BUCKET: string = ''
-if (process.env.AWS_BUCKET_NAME)
-    BUCKET = process.env.AWS_BUCKET_NAME;
-else
-    console.error("S3 BUCKET NAME NOT SPECIFIED");
+let BUCKET = process.env.AWS_BUCKET_NAME || ""
 
 
 // Uploads file from filesystem to S3
