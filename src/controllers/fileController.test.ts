@@ -1,11 +1,14 @@
 import request from 'supertest'
 
-import {createServer} from '../server'
-const server = createServer()
+beforeEach(() => {
+    jest.resetModules()
+})
 
 
 describe('POST /api/upload', function() {
     it('400s when file is not set', (done) => {
+        const {createServer} = require('../server')
+        const server = createServer()
         request(server)
             .post('/api/upload')
             .set('Accept', 'application/json')
@@ -18,6 +21,8 @@ describe('POST /api/upload', function() {
     });
 
     it('400s when file is not image', (done) => {
+        const {createServer} = require('../server')
+        const server = createServer()
         request(server)
             .post('/api/upload')
             .attach('image', 'package.json')
@@ -30,8 +35,9 @@ describe('POST /api/upload', function() {
             })
     });
 
+
     it('200s when file is set', (done) => {
-        jest.mock("../utils/file_storage", () => {
+        jest.doMock("../utils/file_storage", () => {
             return {
                 __esModule: true,
                 upload: {
@@ -42,12 +48,16 @@ describe('POST /api/upload', function() {
                 }
             }
         })
+
+        const {createServer} = require('../server')
+        const server = createServer()
         request(server)
             .post('/api/upload')
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(200)
-            .end(() => {
+            .end((err, _res) => {
+                if (err) return done(err)
                 done()
             })
     });
