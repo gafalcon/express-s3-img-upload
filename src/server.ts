@@ -1,6 +1,7 @@
 import express from 'express'
 import router from './routes'
 import myDataSource from "./app-data-source"
+import { validateToken } from './utils/auth';
 
 
 const env = process.env.ENVIRONMENT;
@@ -26,6 +27,8 @@ export function createServer() {
     })
 
     app.use('/api', router)
+
+    app.use(validateToken)
 
     return app
 }
