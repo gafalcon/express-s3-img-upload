@@ -1,9 +1,12 @@
 import request from 'supertest'
+import {Image} from "../entity/image.entity"
+import { mockAuth } from '../tests/mocks'
 
 beforeEach(() => {
     jest.resetModules()
 })
 
+mockAuth()
 
 describe('POST /api/upload', function() {
     it('400s when file is not set', (done) => {
@@ -48,6 +51,16 @@ describe('POST /api/upload', function() {
                 }
             }
         })
+        jest.doMock("../entity/image.entity", () => {
+            return {
+                saveImg: () => {
+                    const savedImage = new Image()
+                    savedImage.url = "url"
+                    savedImage.user = "user"
+                    return Promise.resolve(savedImage)
+                }
+            }
+        })
 
         const {createServer} = require('../server')
         const server = createServer()
@@ -56,8 +69,9 @@ describe('POST /api/upload', function() {
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(200)
-            .end((err, _res) => {
+            .end((err, res) => {
                 if (err) return done(err)
+                expect(res.body).toMatchObject({response: {user: "user", url: "url"}})
                 done()
             })
     });
