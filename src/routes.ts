@@ -19,11 +19,11 @@ router.get("/test_db", async (_req, res) => {
     res.send({img: savedImg})
 })
 
-router.get("/test_auth", authCheck, (req: JWTRequest, res:express.Response) => {
+router.get("/test_auth", authCheck, (_req: JWTRequest, res:express.Response) => {
     // console.log(req.auth.sub)
     res.send({msg: "authorized"})
 })
 
-router.post("/upload", upload.single('image'), postImg)
+router.post("/upload", authCheck, upload.single('image'), postImg)
 
 export default router
