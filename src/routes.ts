@@ -1,7 +1,7 @@
 import express from 'express'
 import myDataSource from './app-data-source'
-import {postImg} from './controllers/fileController'
-import { Image } from './entity/image.entity'
+import { getImgs, postImg} from './controllers/fileController'
+import Image from './entity/image.entity'
 import { authCheck } from './utils/auth'
 import {upload} from './utils/file_storage'
 import {Request as JWTRequest} from 'express-jwt'
@@ -20,10 +20,11 @@ router.get("/test_db", async (_req, res) => {
 })
 
 router.get("/test_auth", authCheck, (_req: JWTRequest, res:express.Response) => {
-    // console.log(req.auth.sub)
     res.send({msg: "authorized"})
 })
 
-router.post("/upload", authCheck, upload.single('image'), postImg)
+router.post("/images/upload", authCheck, upload.single('image'), postImg)
+
+router.get("/images", getImgs)
 
 export default router

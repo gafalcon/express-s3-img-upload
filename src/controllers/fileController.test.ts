@@ -1,6 +1,6 @@
 import request from 'supertest'
-import {Image} from "../entity/image.entity"
 import { mockAuth } from '../tests/mocks'
+import {ImageRepository} from '../tests/repositories'
 
 beforeEach(() => {
     jest.resetModules()
@@ -13,7 +13,7 @@ describe('POST /api/upload', function() {
         const {createServer} = require('../server')
         const server = createServer()
         request(server)
-            .post('/api/upload')
+            .post('/api/images/upload')
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(400)
@@ -27,7 +27,7 @@ describe('POST /api/upload', function() {
         const {createServer} = require('../server')
         const server = createServer()
         request(server)
-            .post('/api/upload')
+            .post('/api/images/upload')
             .attach('image', 'package.json')
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
@@ -45,34 +45,47 @@ describe('POST /api/upload', function() {
                 __esModule: true,
                 upload: {
                     single: () => ((req:any, _res:any, next: any)=> {
-                        req.file = "file"
+                        req.file = {"location": "test_url"}
                         next()
                     })
                 }
             }
         })
-        jest.doMock("../entity/image.entity", () => {
-            return {
-                saveImg: () => {
-                    const savedImage = new Image()
-                    savedImage.url = "url"
-                    savedImage.user = "user"
-                    return Promise.resolve(savedImage)
-                }
-            }
-        })
+        jest.doMock("../repositories/image_repository", () => ImageRepository)
 
         const {createServer} = require('../server')
         const server = createServer()
         request(server)
-            .post('/api/upload')
+            .post('/api/images/upload')
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(200)
             .end((err, res) => {
                 if (err) return done(err)
-                expect(res.body).toMatchObject({response: {user: "user", url: "url"}})
+                expect(res.body).toMatchObject({response: {user: "mock_user", url: "test_url"}})
                 done()
             })
     });
 });
+
+
+describe("GET /api/images", () => {
+    it("Returns all stored images", (done) => {
+        jest.doMock("../repositories/image_repository", () => ImageRepository)
+        const {createServer} = require('../server')
+        const server = createServer()
+
+        request(server)
+            .get('/api/images')
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .end((err, res) => {
+                if (err) return done(err)
+                expect(res.body).toMatchObject({images: [
+                    {url: "test_url", user: "test_user"}
+                ]})
+                done()
+            })
+    })
+})
