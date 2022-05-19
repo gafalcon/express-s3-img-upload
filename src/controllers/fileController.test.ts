@@ -89,3 +89,86 @@ describe("GET /api/images", () => {
             })
     })
 })
+
+describe("DELETE /api/images/upload", () => {
+    it("Returns 404 when image does not exist", (done) => {
+
+        jest.doMock("../repositories/image_repository", () => (
+            {instance: {getImage: () => Promise.resolve(null)}}
+        ))
+
+        const {createServer} = require('../server')
+        const server = createServer()
+
+        request(server)
+            .delete('/api/images/imageId')
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(404)
+            .end((err, res) => {
+                if (err) return done(err)
+                expect(res.body).toMatchObject(
+                    {response: "Image not Found"}
+                )
+                done()
+            })
+    })
+
+    it("Returns 403 when auth user is not owner of image", (done) => {
+        jest.doMock("../repositories/image_repository", () => (
+            {instance: {getImage: () => Promise.resolve({user: "user"})}}
+        ))
+
+        const {createServer} = require('../server')
+        const server = createServer()
+
+        request(server)
+            .delete('/api/images/imageId')
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(403)
+            .end((err, res) => {
+                if (err) return done(err)
+                expect(res.body).toMatchObject(
+                    {response: "Unauthorized to delete this image"}
+                )
+                done()
+            })
+    })
+
+    it("Returns 200 when deleting image", (done) => {
+        jest.doMock("../repositories/image_repository", () => (
+            {
+                instance: {
+                    getImage: () => Promise.resolve({user: "mock_user"}),
+                    deleteImage: () => Promise.resolve()
+                }
+            }
+        ))
+        jest.doMock("../utils/file_storage", () => ({
+            deleteFile: () => Promise.resolve(),
+            upload: {
+                single: () => ((req:any, _res:any, next: any)=> {
+                    req.file = {"location": "test_url"}
+                    next()
+                })
+            }
+        }))
+
+        const {createServer} = require('../server')
+        const server = createServer()
+
+        request(server)
+            .delete('/api/images/imageId')
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .end((err, res) => {
+                if (err) return done(err)
+                expect(res.body).toMatchObject(
+                    {response: "Deleted!"}
+                )
+                done()
+            })
+    })
+})

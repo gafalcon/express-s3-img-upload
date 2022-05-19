@@ -65,6 +65,25 @@ describe("ImageRepository", () => {
             expect(img.user).toBe("user1")
         })
     })
+
+    it("should not delete if image does not exist", async () => {
+        const result = await img_repo.deleteImage("62788e3e6066a2a54a7194c2")
+        expect(result.deletedCount).toBe(0)
+    })
+
+    it("should delete image by imageId", async () => {
+        const repo = myDataSource.getMongoRepository(Image)
+        const savedImgs = await repo.save([
+            new Image("test_url1", "user1"), new Image("test_url2", "user1")
+        ])
+
+        const result = await img_repo.deleteImage(savedImgs[0].id.toString())
+        expect(result.deletedCount).toBe(1)
+
+        const mongoImage = await myDataSource.getMongoRepository(Image).findOneBy({_id: savedImgs[0].id})
+        expect(mongoImage).toBeNull()
+
+    })
 })
 
 
