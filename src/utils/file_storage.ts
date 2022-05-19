@@ -23,6 +23,10 @@ export const uploadFile = (filepath: string, filename: string): Promise<AWS.S3.M
     return s3.upload(uploadParams).promise()
 }
 
+export const deleteFile = (key: string) => {
+    return s3.deleteObject({Bucket: BUCKET, Key: key}).promise()
+}
+
 // Middleware to upload file to S3 from form request
 export const upload = multer({
     storage: multerS3({

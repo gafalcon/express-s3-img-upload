@@ -1,6 +1,7 @@
 import Express from 'express'
 import {Request as JWTRequest} from 'express-jwt'
 import ImageRepository from '../repositories/image_repository'
+import { deleteFile } from '../utils/file_storage'
 
 export const postImg = async (req: JWTRequest, res: Express.Response) => {
     if (!req.file) {
@@ -14,7 +15,7 @@ export const postImg = async (req: JWTRequest, res: Express.Response) => {
 
     try {
         const imgRepo = ImageRepository.instance
-        const savedImg = await imgRepo.saveImage(req.file.location, req.auth.sub)
+        const savedImg = await imgRepo.saveImage(req.file.location, req.auth.sub, req.file.key)
         res.status(200).send({response: savedImg})
     } catch (err) {
         //TODO I should probably remove from s3 as well
@@ -42,6 +43,7 @@ export const deleteImage = async(req: JWTRequest, res: Express.Response) => {
     if (image.user !== req.auth.sub) {return res.status(403).send({response: "Unauthorized to delete this image"})}
 
     await imgRepo.deleteImage(imageId)
-    //TODO delete image from s3 as well
+    await deleteFile(image.s3Key)
+
     res.status(200).send({response: "Deleted!"})
 }

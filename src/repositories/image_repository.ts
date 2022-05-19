@@ -28,8 +28,8 @@ export default class ImageRepository {
     }
 
 
-    async saveImage(url: string, user: string) : Promise<Image> {
-        const newImg = new Image(url, user)
+    async saveImage(url: string, user: string, s3Key?: string) : Promise<Image> {
+        const newImg = new Image(url, user, s3Key)
         const savedImg = await this.repository.save(newImg)
         return savedImg
     }

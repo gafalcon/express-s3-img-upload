@@ -145,6 +145,15 @@ describe("DELETE /api/images/upload", () => {
                 }
             }
         ))
+        jest.doMock("../utils/file_storage", () => ({
+            deleteFile: () => Promise.resolve(),
+            upload: {
+                single: () => ((req:any, _res:any, next: any)=> {
+                    req.file = {"location": "test_url"}
+                    next()
+                })
+            }
+        }))
 
         const {createServer} = require('../server')
         const server = createServer()
