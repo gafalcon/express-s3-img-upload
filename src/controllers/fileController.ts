@@ -33,3 +33,15 @@ export const getImgs = async(req: JWTRequest, res:Express.Response) => {
     const imgs = await imgRepo.getImages(user)
     res.status(200).send({images: imgs})
 }
+
+export const deleteImage = async(req: JWTRequest, res: Express.Response) => {
+    const imageId = req.params["imageId"]
+    const imgRepo = ImageRepository.instance
+    const image = await imgRepo.getImage(imageId)
+    if (!image) {return res.status(404).send({response: "Image not Found"})}
+    if (image.user !== req.auth.sub) {return res.status(403).send({response: "Unauthorized to delete this image"})}
+
+    await imgRepo.deleteImage(imageId)
+    //TODO delete image from s3 as well
+    res.status(200).send({response: "Deleted!"})
+}

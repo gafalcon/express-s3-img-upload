@@ -1,4 +1,5 @@
 import { MongoRepository } from 'typeorm';
+import { ObjectId } from "mongodb"
 import myDataSource from '../app-data-source'
 import Image from '../entity/image.entity'
 
@@ -16,6 +17,10 @@ export default class ImageRepository {
         return this._instance;
     }
 
+    async getImage(imageId: string): Promise<Image | null> {
+        return this.repository.findOneBy({_id: new ObjectId(imageId)})
+    }
+
     async getImages(user?: string) : Promise<Image[]> {
         const options : any= {}
         if (user) options["where"]= {user}
@@ -24,10 +29,12 @@ export default class ImageRepository {
 
 
     async saveImage(url: string, user: string) : Promise<Image> {
-        const newImg = new Image()
-        newImg.url = url
-        newImg.user = user
+        const newImg = new Image(url, user)
         const savedImg = await this.repository.save(newImg)
         return savedImg
+    }
+
+    async deleteImage(imageId: string) {
+        return this.repository.deleteOne({_id: new ObjectId(imageId)})
     }
 }

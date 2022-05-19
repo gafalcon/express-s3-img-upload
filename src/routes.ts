@@ -1,6 +1,6 @@
 import express from 'express'
 import myDataSource from './app-data-source'
-import { getImgs, postImg} from './controllers/fileController'
+import { deleteImage, getImgs, postImg} from './controllers/fileController'
 import Image from './entity/image.entity'
 import { authCheck } from './utils/auth'
 import {upload} from './utils/file_storage'
@@ -26,5 +26,7 @@ router.get("/test_auth", authCheck, (_req: JWTRequest, res:express.Response) => 
 router.post("/images/upload", authCheck, upload.single('image'), postImg)
 
 router.get("/images", getImgs)
+
+router.delete("/images/:imageId", authCheck, deleteImage)
 
 export default router
