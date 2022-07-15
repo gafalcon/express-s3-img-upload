@@ -2,6 +2,8 @@ on:
   pull_request_target:
     types:
       - closed
+    branches:
+      - 'test2'
     paths:
       - 'test_folder/test_file.js'
 
