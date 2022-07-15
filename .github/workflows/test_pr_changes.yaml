@@ -2,6 +2,8 @@ on:
   pull_request_target:
     types:
       - closed
+    paths:
+      - 'test_folder/test_file.js'
 
 jobs:
   if_merged:
@@ -10,4 +12,6 @@ jobs:
     steps:
     - run: |
         echo The PR was merged
+        echo The title of you PR is ${{ github.event.pull_request.title}}
+        echo The body of you PR is ${{ github.event.pull_request.body}}
 
